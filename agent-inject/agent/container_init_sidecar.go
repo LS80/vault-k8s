@@ -95,6 +95,10 @@ func (a *Agent) ContainerInitSidecar() (corev1.Container, error) {
 	if a.SetSecurityContext {
 		newContainer.SecurityContext = a.securityContext()
 	}
+	if a.VaultAgentMetricsListenerPort > 0 {
+		containerPort := corev1.ContainerPort{ContainerPort: int32(a.VaultAgentMetricsListenerPort)}
+		newContainer.Ports = append(newContainer.Ports, containerPort)
+	}
 
 	// apply any JSON patch requested
 	if a.InitJsonPatch == "" {

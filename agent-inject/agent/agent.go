@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 
 	jsonpatch "github.com/evanphx/json-patch"
@@ -130,6 +131,9 @@ type Agent struct {
 	// VaultAgentTemplateConfig is the structure holding the Vault agent
 	// template_config specific configuration
 	VaultAgentTemplateConfig VaultAgentTemplateConfig
+
+	// VaultAgentMetricsListenerPort is the port used to server the Vault agent metrics
+	VaultAgentMetricsListenerPort uint16
 
 	// RunAsUser is the user ID to run the Vault agent container(s) as.
 	RunAsUser int64
@@ -543,6 +547,12 @@ func New(pod *corev1.Pod) (*Agent, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	agentMetricsListenerPort, err := strconv.ParseUint(pod.Annotations[AnnotationAgentMetricsListenerPort], 10, 16)
+	if err != nil {
+		return agent, err
+	}
+	agent.VaultAgentMetricsListenerPort = uint16(agentMetricsListenerPort)
 
 	return agent, nil
 }
